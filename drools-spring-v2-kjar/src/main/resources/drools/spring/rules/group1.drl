@@ -1,0 +1,9 @@
+import com.sbnz.sbnz.domain.Disease;
+
+
+rule "Classify Item - Low Range"
+    when
+        $d: Disease()
+    then
+        System.out.println("USPELO JE!");
+end
