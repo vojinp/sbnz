@@ -19,6 +19,9 @@ public class Ingredient {
     @ManyToMany
     private Set<Patient> patients = new HashSet<>();
 
+    @ManyToMany
+    private Set<Medication> medications = new HashSet<>();
+
     public Set<Patient> getPatients() {
         return patients;
     }
@@ -41,5 +44,13 @@ public class Ingredient {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<Medication> getMedications() {
+        return medications;
+    }
+
+    public void setMedications(Set<Medication> medications) {
+        this.medications = medications;
     }
 }

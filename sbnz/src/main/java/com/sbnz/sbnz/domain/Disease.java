@@ -23,14 +23,6 @@ public class Disease {
     @JsonIgnore
     private Set<Diagnosis> diagnoses = new HashSet<>();
 
-    public Set<Diagnosis> getDiagnoses() {
-        return diagnoses;
-    }
-
-    public void setDiagnoses(Set<Diagnosis> diagnoses) {
-        this.diagnoses = diagnoses;
-    }
-
     @Column(name = "d_group")
     private Group group;
 
@@ -40,6 +32,21 @@ public class Disease {
             joinColumns = {@JoinColumn(name = "disease_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "symptom_id", referencedColumnName = "id")})
     private Set<Symptom> symptoms = new HashSet<>();
+
+    public Disease(@NotNull String name) {
+        this.name = name;
+    }
+
+    public Disease() {
+    }
+
+    public Set<Diagnosis> getDiagnoses() {
+        return diagnoses;
+    }
+
+    public void setDiagnoses(Set<Diagnosis> diagnoses) {
+        this.diagnoses = diagnoses;
+    }
 
     public Long getId() {
         return id;
@@ -64,7 +71,7 @@ public class Disease {
     public void setGroup(Group group) {
         this.group = group;
     }
-/*
+
     public Set<Symptom> getSymptoms() {
         return symptoms;
     }
@@ -72,5 +79,9 @@ public class Disease {
     public void setSymptoms(Set<Symptom> symptoms) {
         this.symptoms = symptoms;
     }
-    */
+
+    @Override
+    public boolean equals(Object obj) {
+        return name.equals(((Disease) obj).getName());
+    }
 }

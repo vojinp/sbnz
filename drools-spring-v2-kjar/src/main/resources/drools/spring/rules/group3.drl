@@ -1,0 +1,133 @@
+import com.sbnz.sbnz.domain.Disease;
+import com.sbnz.sbnz.domain.Symptoms;
+import com.sbnz.sbnz.domain.Diagnosis;
+import com.sbnz.sbnz.domain.Patient;
+import com.sbnz.sbnz.domain.Symptom;
+import com.sbnz.sbnz.domain.Medication;
+import com.sbnz.sbnz.util.Utility;
+import com.sbnz.sbnz.domain.enumeration.MedType;
+import java.util.Date;
+import org.joda.time.DateTime;
+import java.util.Arrays;
+
+rule "Hronicna bubrezna bolest"
+agenda-group "Diseases"
+activation-group "3"
+lock-on-active true
+salience( (Utility.getPercentage($counter, 5) + Utility.getPercentage($specCounter, 2)) / 2 )
+    when
+    	$s : Symptoms ($symps: symptoms,
+    	        $specSymps: Arrays.asList("Hipertenzija", "Dijabetes"))
+    	$counter: Integer ( intValue >= 2 ) from accumulate (
+    		Symptom(
+    			name.equals("Zamor") ||
+                name.equals("Nocturia") ||
+                name.equals("Otoci nogu i zglobova") ||
+                name.equals("Gusenje") ||
+                name.equals("Bol u grudima")
+    		) from $symps,
+    		init ( int i = 0; ),
+    		action ( i++; ),
+    		reverse ( i--; ),
+    		result ( i )
+    	)
+    	$specCounter: Integer ( intValue >= 1 ) from accumulate (
+            String(
+                (equals("Hipertenzija") && hasHypertensionForMoreThan6Months($s)) ||
+                (equals("Dijabetes") && hasDiabetes($s))
+            ) from $specSymps,
+            init ( int i = 0; ),
+            action ( i++; ),
+            reverse ( i--; ),
+            result ( i )
+        )
+    then
+        System.out.println( "Activated rule: hronicna bubrezna bolest");
+end
+
+rule "Akutna bubrezna povreda"
+agenda-group "Diseases"
+activation-group "3"
+lock-on-active true
+salience( (Utility.getPercentage($counter, 4) + Utility.getPercentage($specCounter, 3)) / 2 )
+    when
+    	$s : Symptoms ($symps: symptoms,
+    	        $specSymps: Arrays.asList("Operacija", "Temperatura", "Antibiotici"))
+    	$counter: Integer ( intValue >= 2 ) from accumulate (
+    		Symptom(
+    			name.equals("Zamor") ||
+                name.equals("Gusenje") ||
+                name.equals("Otoci nogu i zglobova") ||
+                name.equals("Dijareja")
+    		) from $symps,
+    		init ( int i = 0; ),
+    		action ( i++; ),
+    		reverse ( i--; ),
+    		result ( i )
+    	)
+    	$specCounter: Integer ( intValue >= 1 ) from accumulate (
+            String(
+                (equals("Operacija") && hadSurgery($s)) ||
+                (equals("Temperatura") && highBodyTemperatureInLast14Days($s)) ||
+                (equals("Antibiotici") && antibioticPrescriptionInLast21Days($s))
+
+            ) from $specSymps,
+            init ( int i = 0; ),
+            action ( i++; ),
+            reverse ( i--; ),
+            result ( i )
+        )
+    then
+        System.out.println( "Activated rule: akutna bubrezna povreda");
+end
+
+function boolean hasHypertensionForMoreThan6Months(Symptoms s) {
+    for (Diagnosis diagnosis: s.getPatient().getDiagnoses()) {
+        if (diagnosis.getDate().before(new DateTime(new Date()).minusMonths(6).toDate()) &&
+            diagnosis.getDisease().equals(new Disease("Hipertenzija"))) {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+function boolean hasDiabetes(Symptoms s) {
+    for (Diagnosis diagnosis: s.getPatient().getDiagnoses()) {
+        if (diagnosis.getDisease().equals(new Disease("Diabetes"))) {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+function boolean hadSurgery(Symptoms s) {
+    return s.getPatient().isInRecovery();
+}
+
+function boolean highBodyTemperatureInLast14Days(Symptoms s) {
+    for (Diagnosis diagnosis: s.getPatient().getDiagnoses()) {
+        if (diagnosis.getDate().after(new DateTime(new Date()).minusDays(14).toDate())) {
+            if (diagnosis.getDisease().getSymptoms().equals(new Symptom("Temperatura veca od 38")) ||
+                diagnosis.getDisease().getSymptoms().equals(new Symptom("Temperatura od 40 do 41"))) {
+                return true;
+            }
+
+        }
+    }
+    return false;
+}
+
+function boolean antibioticPrescriptionInLast21Days(Symptoms s) {
+    for (Diagnosis diagnosis: s.getPatient().getDiagnoses()) {
+            if (diagnosis.getDate().after(new DateTime(new Date()).minusDays(21).toDate())) {
+                for (Medication medication: diagnosis.getMedications()) {
+                    if (medication.getType().equals(MedType.ANTIBIOTIC)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+}

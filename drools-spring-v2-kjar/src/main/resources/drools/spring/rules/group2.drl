@@ -1,0 +1,55 @@
+import com.sbnz.sbnz.domain.Disease;
+import com.sbnz.sbnz.domain.Symptoms;
+import com.sbnz.sbnz.domain.Diagnosis;
+import com.sbnz.sbnz.domain.Patient;
+import com.sbnz.sbnz.domain.Symptom;
+import com.sbnz.sbnz.util.Utility;
+import java.util.Date;
+import org.joda.time.DateTime;
+
+
+rule "Hipertenzija"
+agenda-group "Diseases"
+activation-group "2"
+lock-on-active true
+    when
+    	$s : Symptoms (countInSixMonths($s) >= 10)
+    then
+        System.out.println( "Activated rule: hipertenzija");
+end
+
+
+rule "Dijabetes"
+agenda-group "Diseases"
+activation-group "2"
+lock-on-active true
+    when
+    	$s : Symptoms ($symps: symptoms)
+    	$counter: Integer ( intValue == 4 ) from accumulate (
+    		Symptom(
+    			name.equals("Cesto uriniranje") ||
+                name.equals("Gubitak telesne tezine") ||
+                name.equals("Zamor") ||
+                name.equals("Povracanje")
+    		) from $symps,
+    		init ( int i = 0; ),
+    		action ( i++; ),
+    		reverse ( i--; ),
+    		result ( i )
+    	)
+    then
+        System.out.println( "Activated rule: dijabetes");
+end
+
+function int countInSixMonths(Symptoms s) {
+    int counter = 0;
+    for (Diagnosis diagnosis: s.getPatient().getDiagnoses()) {
+       if (diagnosis.getDate().after(new DateTime(new Date()).minusMonths(6).toDate()) &&
+             diagnosis.getDisease().getSymptoms().contains(new Symptom("Visok pritisak"))) {
+
+           counter += 1;
+       }
+    }
+
+    return counter;
+}

@@ -17,8 +17,26 @@ public class Symptom {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "specific")
+    private boolean specific = false;
+
     @ManyToMany
     private Set<Disease> diseases = new HashSet<>();
+
+    public Symptom(@NotNull String name) {
+        this.name = name;
+    }
+
+    public Symptom() {
+    }
+
+    public boolean isSpecific() {
+        return specific;
+    }
+
+    public void setSpecific(boolean specific) {
+        this.specific = specific;
+    }
 
     public Long getId() {
         return id;
@@ -42,5 +60,10 @@ public class Symptom {
 
     public void setDiseases(Set<Disease> diseases) {
         this.diseases = diseases;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return name.equals(((Symptom) obj).getName());
     }
 }

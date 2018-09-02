@@ -1,0 +1,56 @@
+import com.sbnz.sbnz.domain.Disease;
+import com.sbnz.sbnz.domain.Symptoms;
+import com.sbnz.sbnz.domain.Diagnosis;
+import com.sbnz.sbnz.domain.Ingredient;
+import com.sbnz.sbnz.domain.Patient;
+import com.sbnz.sbnz.domain.Symptom;
+import com.sbnz.sbnz.domain.Medication;
+import com.sbnz.sbnz.util.Utility;
+import com.sbnz.sbnz.domain.enumeration.MedType;
+import java.util.Date;
+import org.joda.time.DateTime;
+import java.util.List;
+import java.util.ArrayList;
+
+
+query "Symptoms for disease"(String $name)
+    $d: Disease(name == $name, $symptoms : symptoms)
+    $specifics: List() from accumulate (
+        $s: Symptom(
+            specific == true
+        ) from $symptoms,
+        init ( List<Symptom> symptoms = new ArrayList<Symptom>(); ),
+        action ( symptoms.add($s); ),
+        reverse ( symptoms.remove($s); ),
+        result ( symptoms )
+    )
+    $allSymptoms: List() from accumulate (
+        $s: Symptom(
+            specific == false
+        ) from $symptoms,
+        init ( ),
+        action ( $specifics.add($s); ),
+        reverse ( $specifics.remove($s); ),
+        result ( $specifics )
+    )
+end
+
+query "Diseases for symptoms"(Symptoms $symptoms)
+    $mc: Disease($disSymptoms : symptoms)
+    $count: Number( intValue > 0 ) from accumulate (
+        $s: Symptom() from $disSymptoms and containsSymptom($symptoms:$symptoms, $s:$s),
+        init ( List<Symptom> symptoms = new ArrayList<Symptom>(); ),
+        action ( symptoms.add($s); ),
+        reverse ( symptoms.remove($s); ),
+        result ( symptoms.size() )
+    )
+end
+
+query containsSymptom(Symptoms $symptoms, Symptom $s)
+    $contained: Number( intValue > 0) from accumulate (
+        $found: Symptom(
+            name.equals($s.name)
+        ) from $symptoms.symptoms,
+        count($found)
+    )
+end

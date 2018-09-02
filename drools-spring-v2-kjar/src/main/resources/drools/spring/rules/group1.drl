@@ -1,9 +1,100 @@
 import com.sbnz.sbnz.domain.Disease;
+import com.sbnz.sbnz.domain.Symptoms;
+import com.sbnz.sbnz.domain.Diagnosis;
+import com.sbnz.sbnz.domain.Patient;
+import com.sbnz.sbnz.domain.Symptom;
+import com.sbnz.sbnz.util.Utility;
+import java.util.Date;
+import org.joda.time.DateTime;
 
-
-rule "Classify Item - Low Range"
+rule "Prehlada"
+agenda-group "Diseases"
+activation-group "1"
+lock-on-active true
+salience( Utility.getPercentage($counter, 5) )
     when
-        $d: Disease()
+    	$s : Symptoms ($symps: symptoms)
+    	$counter: Integer ( intValue >= 0 ) from accumulate (
+    		Symptom(
+    			name.equals("Curenje iz nosa") ||
+                name.equals("Bol u grlu") ||
+                name.equals("Glavobolja") ||
+                name.equals("Kijanje") ||
+                name.equals("Kasalj")
+    		) from $symps,
+    		init ( int i = 0; ),
+    		action ( i++; ),
+    		reverse ( i--; ),
+    		result ( i )
+    	)
     then
-        System.out.println("USPELO JE!");
+        System.out.println( "Activated rule: prehlada");
+	    System.out.println(Utility.getPercentage($counter, 5));
 end
+
+rule "Groznica"
+agenda-group "Diseases"
+activation-group "1"
+lock-on-active true
+salience( Utility.getPercentage($counter, 7) )
+    when
+    	$s : Symptoms ($symps: symptoms)
+    	$counter: Integer ( intValue >= 0 ) from accumulate (
+    		Symptom(
+    			name.equals("Kijanje") ||
+                name.equals("Bol u grlu") ||
+                name.equals("Kasalj") ||
+                name.equals("Temperatura veca od 38") ||
+                name.equals("Curenje iz nosa") ||
+                name.equals("Glavobolja") ||
+                name.equals("Drhtavica")
+
+    		) from $symps,
+    		init ( int i = 0; ),
+    		action ( i++; ),
+    		reverse ( i--; ),
+    		result ( i )
+    	)
+    then
+        System.out.println( "Activated rule: groznica");
+	    System.out.println(Utility.getPercentage($counter, 7));
+end
+
+rule "Sinusna infekcija"
+agenda-group "Diseases"
+activation-group "1"
+lock-on-active true
+salience( Utility.getPercentage($counter, 6) )
+    when
+    	$s : Symptoms ($symps: symptoms,
+    	                    eval(coldOrFeverInLastSixtyDays($s)))
+    	$counter: Integer ( intValue >= 0 ) from accumulate (
+    		Symptom(
+    			name.equals("Oticanje oko ociju") ||
+                name.equals("Glavobolja") ||
+                name.equals("Zuti sekret iz nosa") ||
+                name.equals("Temperatura veca od 38") ||
+                name.equals("Bol u grlu") ||
+                name.equals("Kasalj")
+    		) from $symps,
+    		init ( int i = 1; ),
+    		action ( i++; ),
+    		reverse ( i--; ),
+    		result ( i )
+    	)
+    then
+        System.out.println( "Activated rule: sinusna infekcija");
+	    System.out.println(Utility.getPercentage($counter, 7));
+end
+
+function boolean coldOrFeverInLastSixtyDays(Symptoms s) {
+    for (Diagnosis diagnosis: s.getPatient().getDiagnoses()) {
+        if (diagnosis.getDate().after(new DateTime(new Date()).minusDays(60).toDate()) &&
+                (diagnosis.getDisease().getName().equals("Prehlada") ||
+                        diagnosis.getDisease().getName().equals("Groznica"))) {
+
+            return true;
+        }
+    }
+    return false;
+}

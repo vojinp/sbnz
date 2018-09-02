@@ -1,0 +1,32 @@
+import com.sbnz.sbnz.domain.Disease;
+import com.sbnz.sbnz.domain.Symptoms;
+import com.sbnz.sbnz.domain.Diagnosis;
+import com.sbnz.sbnz.domain.Ingredient;
+import com.sbnz.sbnz.domain.Patient;
+import com.sbnz.sbnz.domain.Symptom;
+import com.sbnz.sbnz.domain.Medication;
+import com.sbnz.sbnz.util.Utility;
+import com.sbnz.sbnz.domain.enumeration.MedType;
+import java.util.Date;
+import org.joda.time.DateTime;
+import java.util.List;
+import java.util.ArrayList;
+
+query "Diagnosis validator"(Long $diagnosisId)
+    $a: Diagnosis(id == $diagnosisId, $ingredientAllergies : patient.ingredients, $proposedMedication : medications)
+    $proposedIngredients: List() from accumulate (
+            $m: Medication() from $proposedMedication,
+            init ( List<Ingredient> ingredients = new ArrayList<Ingredient>(); ),
+            action ( ingredients.addAll($m.getIngredients()); ),
+            result ( ingredients )
+        )
+    $criticalIngredients: List() from accumulate (
+        $i: Ingredient(
+            $ingredientAllergies.contains($i)
+        ) from $proposedIngredients,
+        init ( List<Ingredient> ingredients = new ArrayList<Ingredient>(); ),
+        action ( ingredients.add($i); ),
+        reverse ( ingredients.remove($i); ),
+        result ( ingredients )
+    )
+end

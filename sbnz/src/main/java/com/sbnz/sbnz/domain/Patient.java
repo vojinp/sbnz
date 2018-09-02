@@ -20,6 +20,11 @@ public class Patient {
     @Column(name = "lastname", nullable = false)
     private String lastname;
 
+    @NotNull
+    @Column(name = "recovery", nullable = false)
+    private boolean inRecovery;
+
+
     @ManyToMany
     @JoinTable(
             name = "patient_ingredient",
@@ -29,6 +34,14 @@ public class Patient {
 
     @OneToMany(mappedBy = "patient")
     private Set<Diagnosis> diagnoses = new HashSet<>();
+
+    public boolean isInRecovery() {
+        return inRecovery;
+    }
+
+    public void setInRecovery(boolean inRecovery) {
+        this.inRecovery = inRecovery;
+    }
 
     public Long getId() {
         return id;

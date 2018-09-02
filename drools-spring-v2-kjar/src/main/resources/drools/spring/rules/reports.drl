@@ -1,0 +1,122 @@
+import com.sbnz.sbnz.domain.Disease;
+import com.sbnz.sbnz.domain.Symptoms;
+import com.sbnz.sbnz.domain.Diagnosis;
+import com.sbnz.sbnz.domain.Ingredient;
+import com.sbnz.sbnz.domain.Patient;
+import com.sbnz.sbnz.domain.Symptom;
+import com.sbnz.sbnz.domain.Medication;
+import com.sbnz.sbnz.util.Utility;
+import com.sbnz.sbnz.domain.enumeration.MedType;
+import java.util.Date;
+import org.joda.time.DateTime;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+query "Hronicna oboljenja"
+
+    $p : Patient($patientId: id, $diagnoses: diagnoses)
+    $diseasesInLast2Years: List() from accumulate (
+        $d: Diagnosis(
+            date.after(new DateTime(new Date()).minusYears(2).toDate())
+        ) from $diagnoses,
+        init ( Set<Disease> diseases = new HashSet<Disease>(); ),
+        action (
+            if (!$d.getDisease().getName().equals("Prehlada") && !$d.getDisease().getName().equals("Grip")) {
+                diseases.add($d.getDisease());
+            }
+        ),
+        result ( diseases )
+    )
+    $diseasesInLast2YearsWithMoreThan5Diagnoses: List( size > 0 ) from accumulate (
+            Disease( $name: name, eval(moreThan5Times($p, $name)))  from $diseasesInLast2Years,
+            init ( List <String> diseases = new ArrayList<String>(); ),
+            action ( diseases.add($name); ),
+            reverse ( diseases.remove($name); ),
+            result ( diseases )
+        )
+end
+
+function boolean moreThan5Times(Patient patient, String name) {
+    int count = 0;
+    for (Diagnosis diagnosis: patient.getDiagnoses()) {
+        if (diagnosis.getDisease().getName().equals(name))
+            count++;
+
+    }
+    return count > 5;
+}
+
+
+query "Zavisnost"
+    $p : Patient($patientId: id, $diagnoses: diagnoses)
+    $diagnosesInLast6Months: List( ) from accumulate (
+        $d: Diagnosis(
+            date.after(new DateTime(new Date()).minusMonths(6).toDate())
+        ) from $diagnoses,
+        init ( List<Diagnosis> diagnoses = new ArrayList<Diagnosis>(); ),
+        action ( diagnoses.add($d); ),
+        reverse ( diagnoses.remove($d); ),
+        result ( diagnoses )
+    )
+    $diagnosesWithPrescribedAnalgesic: List( size >= 6 ) from accumulate (
+        $d: Diagnosis( eval(prescribedAnalgesics($d))) from $diagnosesInLast6Months,
+        init ( List<Diagnosis> diagnoses = new ArrayList<Diagnosis>(); ),
+        action ( diagnoses.add($d); ),
+        reverse ( diagnoses.remove($d); ),
+        result ( diagnoses )
+    )
+    $uniqueDoctorsWhoHavePrescribedAnalgesics: Set( size >= 3 ) from accumulate (
+        $d: Diagnosis( eval(prescribedAnalgesics($d)))  from $diagnosesInLast6Months,
+        init ( Set<Long> doctorIds = new HashSet<Long>(); ),
+        action ( doctorIds.add($d.getDoctor().getId()); ),
+        reverse ( doctorIds.remove($d.getDoctor().getId()); ),
+        result ( doctorIds )
+    )
+end
+
+function boolean prescribedAnalgesics(Diagnosis diagnosis) {
+    for (Medication medication: diagnosis.getMedications()) {
+        if (medication.getType().equals(MedType.ANALGESIC))
+            return true;
+    }
+    return false;
+}
+
+query "Oslabljen imunitet"
+    $p : Patient($patientId: id, $diagnoses: diagnoses)
+    $diagnosesInLast12Months: List( size > 10 ) from accumulate (
+        $d: Diagnosis(
+            date.after(new DateTime(new Date()).minusMonths(6).toDate())
+        ) from $diagnoses,
+        init ( List<Diagnosis> diagnoses = new ArrayList<Diagnosis>(); ),
+        action ( diagnoses.add($d); ),
+        reverse ( diagnoses.remove($d); ),
+        result ( diagnoses )
+    )
+    $distinctConditions: Set( size >= 2 ) from accumulate (
+        $d: Diagnosis() from $diagnosesInLast12Months,
+        init ( Set<Disease> diseases = new HashSet<Disease>(); ),
+        action (
+            diseases.add($d.getDisease());
+        ),
+        reverse ( diseases.remove($d.getDisease()); ),
+        result ( diseases )
+    )
+    $allDiagnosesHaveAntibioticsPrescribed: Set( size ==  $diagnosesInLast12Months.size ) from accumulate (
+        $d: Diagnosis( eval(prescribedAntibiotics($d)))  from $diagnosesInLast12Months,
+        init ( Set<Diagnosis> diagnoses = new HashSet<Diagnosis>(); ),
+        action ( diagnoses.add($d); ),
+        reverse ( diagnoses.remove($d); ),
+        result ( diagnoses )
+    )
+end
+
+function boolean prescribedAntibiotics(Diagnosis diagnosis) {
+    for (Medication medication: diagnosis.getMedications()) {
+        if (medication.getType().equals(MedType.ANTIBIOTIC))
+            return true;
+    }
+    return false;
+}
