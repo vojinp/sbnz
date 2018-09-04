@@ -2,6 +2,9 @@ package com.sbnz.sbnz.service;
 
 import com.sbnz.sbnz.domain.Symptom;
 import com.sbnz.sbnz.repository.SymptomRepository;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,8 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SymptomService {
@@ -18,6 +24,9 @@ public class SymptomService {
 
     @Autowired
     private SymptomRepository symptomRepository;
+
+    @Autowired
+    private KieService kieService;
 
     public Symptom save(Symptom symptom) {
         log.debug("Request to save Symptom : {}", symptom);
@@ -42,4 +51,16 @@ public class SymptomService {
         symptomRepository.deleteById(id);
     }
 
+    public List<Symptom> findSymptomsForDisease(String diseaseName, String token) {
+        KieSession kieSession = kieService.kieSessions.get(token);
+        if (kieSession == null) return new ArrayList<>();
+
+        QueryResults results = kieSession.getQueryResults("Symptoms for disease", diseaseName);
+        List<Symptom> symptoms = new ArrayList<>();
+        for (QueryResultsRow r: results) {
+            symptoms = (ArrayList<Symptom>)r.get("$allSymptoms");
+        }
+
+        return symptoms;
+    }
 }

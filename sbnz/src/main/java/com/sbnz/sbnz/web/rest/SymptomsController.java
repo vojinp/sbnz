@@ -4,12 +4,14 @@ import com.sbnz.sbnz.domain.Diagnosis;
 import com.sbnz.sbnz.domain.Disease;
 import com.sbnz.sbnz.domain.Symptom;
 import com.sbnz.sbnz.domain.Symptoms;
+import com.sbnz.sbnz.service.dto.DiseaseProbabilityDTO;
 import org.joda.time.DateTime;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,4 +54,6 @@ public class SymptomsController {
 
 
     }
+
+
 }

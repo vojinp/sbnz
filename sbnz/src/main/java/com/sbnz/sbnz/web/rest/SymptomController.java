@@ -67,4 +67,11 @@ public class SymptomController {
         symptomService.delete(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/for-disease/{disease-name}")
+    public List<Symptom> findSymptomsForDisease(@RequestHeader("Authorization") String token,
+                                                @PathVariable("disease-name") String diseaseName) {
+        log.debug("REST request to find symptoms for medical condition");
+        return symptomService.findSymptomsForDisease(diseaseName, token);
+    }
 }

@@ -1,5 +1,7 @@
 package com.sbnz.sbnz.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -18,16 +20,19 @@ public class Symptom {
     private String name;
 
     @Column(name = "specific")
-    private boolean specific = false;
+    private boolean specific;
 
     @ManyToMany
+    @JsonIgnore
     private Set<Disease> diseases = new HashSet<>();
 
     public Symptom(@NotNull String name) {
         this.name = name;
+        specific = false;
     }
 
     public Symptom() {
+        specific = false;
     }
 
     public boolean isSpecific() {

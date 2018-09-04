@@ -9,6 +9,9 @@ import com.sbnz.sbnz.domain.enumeration.MedType;
 import java.util.Date;
 import org.joda.time.DateTime;
 import java.util.Arrays;
+import com.sbnz.sbnz.service.DiseaseService;
+
+global DiseaseService diseaseService;
 
 rule "Hronicna bubrezna bolest"
 agenda-group "Diseases"
@@ -43,6 +46,8 @@ salience( (Utility.getPercentage($counter, 5) + Utility.getPercentage($specCount
         )
     then
         System.out.println( "Activated rule: hronicna bubrezna bolest");
+        diseaseService.setProbability($s, "Hronicna bubrezna bolest", (Utility.getPercentage($counter, 5) + Utility.getPercentage($specCounter, 2)) / 2);
+
 end
 
 rule "Akutna bubrezna povreda"
@@ -79,6 +84,8 @@ salience( (Utility.getPercentage($counter, 4) + Utility.getPercentage($specCount
         )
     then
         System.out.println( "Activated rule: akutna bubrezna povreda");
+        diseaseService.setProbability($s, "Akutna bubrezna povreda", (Utility.getPercentage($counter, 4) + Utility.getPercentage($specCounter, 3)) / 2);
+
 end
 
 function boolean hasHypertensionForMoreThan6Months(Symptoms s) {

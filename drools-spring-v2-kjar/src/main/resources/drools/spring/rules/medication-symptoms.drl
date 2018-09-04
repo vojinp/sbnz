@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-query "Symptoms for disease"(String $name)
-    $d: Disease(name == $name, $symptoms : symptoms)
+query "Symptoms for disease"(String $diseaseName)
+    $d: Disease(name == $diseaseName, $symptoms : symptoms)
     $specifics: List() from accumulate (
         $s: Symptom(
             specific == true
@@ -36,7 +36,7 @@ query "Symptoms for disease"(String $name)
 end
 
 query "Diseases for symptoms"(Symptoms $symptoms)
-    $mc: Disease($disSymptoms : symptoms)
+    $d: Disease($disSymptoms : symptoms)
     $count: Number( intValue > 0 ) from accumulate (
         $s: Symptom() from $disSymptoms and containsSymptom($symptoms:$symptoms, $s:$s),
         init ( List<Symptom> symptoms = new ArrayList<Symptom>(); ),

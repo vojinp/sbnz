@@ -6,6 +6,10 @@ import com.sbnz.sbnz.domain.Symptom;
 import com.sbnz.sbnz.util.Utility;
 import java.util.Date;
 import org.joda.time.DateTime;
+import com.sbnz.sbnz.service.DiseaseService;
+
+global DiseaseService diseaseService;
+
 
 rule "Prehlada"
 agenda-group "Diseases"
@@ -14,7 +18,7 @@ lock-on-active true
 salience( Utility.getPercentage($counter, 5) )
     when
     	$s : Symptoms ($symps: symptoms)
-    	$counter: Integer ( intValue >= 0 ) from accumulate (
+    	$counter: Integer ( intValue >= 4 ) from accumulate (
     		Symptom(
     			name.equals("Curenje iz nosa") ||
                 name.equals("Bol u grlu") ||
@@ -29,7 +33,7 @@ salience( Utility.getPercentage($counter, 5) )
     	)
     then
         System.out.println( "Activated rule: prehlada");
-	    System.out.println(Utility.getPercentage($counter, 5));
+        diseaseService.setProbability($s, "Prehlada", Utility.getPercentage($counter, 5));
 end
 
 rule "Groznica"
@@ -39,7 +43,7 @@ lock-on-active true
 salience( Utility.getPercentage($counter, 7) )
     when
     	$s : Symptoms ($symps: symptoms)
-    	$counter: Integer ( intValue >= 0 ) from accumulate (
+    	$counter: Integer ( intValue >= 4 ) from accumulate (
     		Symptom(
     			name.equals("Kijanje") ||
                 name.equals("Bol u grlu") ||
@@ -57,18 +61,18 @@ salience( Utility.getPercentage($counter, 7) )
     	)
     then
         System.out.println( "Activated rule: groznica");
-	    System.out.println(Utility.getPercentage($counter, 7));
+        diseaseService.setProbability($s, "Groznica", Utility.getPercentage($counter, 7));
 end
 
 rule "Sinusna infekcija"
 agenda-group "Diseases"
 activation-group "1"
 lock-on-active true
-salience( Utility.getPercentage($counter, 6) )
+salience( Utility.getPercentage($counter, 7) )
     when
     	$s : Symptoms ($symps: symptoms,
     	                    eval(coldOrFeverInLastSixtyDays($s)))
-    	$counter: Integer ( intValue >= 0 ) from accumulate (
+    	$counter: Integer ( intValue >= 4 ) from accumulate (
     		Symptom(
     			name.equals("Oticanje oko ociju") ||
                 name.equals("Glavobolja") ||
@@ -84,7 +88,7 @@ salience( Utility.getPercentage($counter, 6) )
     	)
     then
         System.out.println( "Activated rule: sinusna infekcija");
-	    System.out.println(Utility.getPercentage($counter, 7));
+        diseaseService.setProbability($s, "Sinusna infekcija", Utility.getPercentage($counter, 7));
 end
 
 function boolean coldOrFeverInLastSixtyDays(Symptoms s) {

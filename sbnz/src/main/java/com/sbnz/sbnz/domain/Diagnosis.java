@@ -19,7 +19,7 @@ public class Diagnosis {
     private Date date;
 
     @ManyToOne
-    @JsonIgnoreProperties("diagnoses")
+    @JoinColumn(name = "disease_id")
     private Disease disease;
 
     @ManyToOne
@@ -28,6 +28,7 @@ public class Diagnosis {
 
     @ManyToOne
     @JoinColumn(name = "patient_id")
+    @JsonIgnoreProperties(value="diagnoses")
     private Patient patient;
 
     @ManyToMany

@@ -6,7 +6,9 @@ import com.sbnz.sbnz.domain.Symptom;
 import com.sbnz.sbnz.util.Utility;
 import java.util.Date;
 import org.joda.time.DateTime;
+import com.sbnz.sbnz.service.DiseaseService;
 
+global DiseaseService diseaseService;
 
 rule "Hipertenzija"
 agenda-group "Diseases"
@@ -16,6 +18,7 @@ lock-on-active true
     	$s : Symptoms (countInSixMonths($s) >= 10)
     then
         System.out.println( "Activated rule: hipertenzija");
+        diseaseService.setProbability($s, "Hipertenzija", 100);
 end
 
 
@@ -39,6 +42,7 @@ lock-on-active true
     	)
     then
         System.out.println( "Activated rule: dijabetes");
+        diseaseService.setProbability($s, "Dijabetes", 100);
 end
 
 function int countInSixMonths(Symptoms s) {

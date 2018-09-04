@@ -2,6 +2,8 @@ package com.sbnz.sbnz.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sbnz.sbnz.domain.enumeration.Group;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -27,6 +29,7 @@ public class Disease {
     private Group group;
 
     @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinTable(
             name = "disease_symptom",
             joinColumns = {@JoinColumn(name = "disease_id", referencedColumnName = "id")},

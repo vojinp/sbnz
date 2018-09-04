@@ -1,5 +1,6 @@
 package com.sbnz.sbnz.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sbnz.sbnz.domain.enumeration.MedType;
 
 import javax.persistence.*;
@@ -31,6 +32,7 @@ public class Medication {
 
 
     @ManyToMany(mappedBy = "medications")
+    @JsonIgnore
     private Set<Diagnosis> diagnoses = new HashSet<>();
 
     public Set<Diagnosis> getDiagnoses() {

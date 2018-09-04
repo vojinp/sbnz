@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static org.hibernate.id.IdentifierGenerator.ENTITY_NAME;
 
@@ -66,5 +70,25 @@ public class PatientController {
         log.debug("REST request to delete Patient : {}", id);
         patientService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/chronic")
+    public List<Patient> getChronicReport(@RequestHeader("Authorization") String token) {
+        log.debug("REST request to get chronic report");
+        return patientService.getChronicReport(token).stream().collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @GetMapping("/addict")
+    public List<Patient> getAddictReport(@RequestHeader("Authorization") String token) {
+        log.debug("REST request to get addict report");
+        return patientService.getAddictReport(token).stream().collect(Collectors.toCollection(LinkedList::new));
+
+    }
+
+    @GetMapping("/immune")
+    public List<Patient> getImmuneReport(@RequestHeader("Authorization") String token) {
+        log.debug("REST request to get immune report");
+        return patientService.getImmuneReport(token).stream().collect(Collectors.toCollection(LinkedList::new));
+
     }
 }

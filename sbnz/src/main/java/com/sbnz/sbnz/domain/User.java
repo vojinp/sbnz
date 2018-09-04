@@ -1,5 +1,6 @@
 package com.sbnz.sbnz.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sbnz.sbnz.domain.enumeration.Authority;
 
 import javax.persistence.*;
@@ -29,6 +30,7 @@ public class User {
     private Authority authority;
 
     @OneToMany(mappedBy = "doctor")
+    @JsonIgnore
     private Set<Diagnosis> diagnoses = new HashSet<>();
 
     public Set<Diagnosis> getDiagnoses() {

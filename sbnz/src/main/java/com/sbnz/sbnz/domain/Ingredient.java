@@ -1,5 +1,7 @@
 package com.sbnz.sbnz.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -17,9 +19,11 @@ public class Ingredient {
     private String name;
 
     @ManyToMany
+    @JsonIgnore
     private Set<Patient> patients = new HashSet<>();
 
     @ManyToMany
+    @JsonIgnore
     private Set<Medication> medications = new HashSet<>();
 
     public Set<Patient> getPatients() {

@@ -23,8 +23,10 @@ query "Hronicna oboljenja"
         ) from $diagnoses,
         init ( Set<Disease> diseases = new HashSet<Disease>(); ),
         action (
+            System.out.println("1");
             if (!$d.getDisease().getName().equals("Prehlada") && !$d.getDisease().getName().equals("Grip")) {
                 diseases.add($d.getDisease());
+                System.out.println("2");
             }
         ),
         result ( diseases )
@@ -45,6 +47,7 @@ function boolean moreThan5Times(Patient patient, String name) {
             count++;
 
     }
+    System.out.println(count);
     return count > 5;
 }
 
