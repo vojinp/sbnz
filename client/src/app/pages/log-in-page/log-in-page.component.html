@@ -1,0 +1,5 @@
+<form [formGroup]="loginForm"  (ngSubmit)="onSubmit($event)">
+  <input type="text" formControlName="username" name="username" id="username" autofocus required>
+  <input type="password" formControlName="password" id="password" name="password">
+  <button class="login-button" type="submit"  id="login-button">Sign in</button>
+</form>
