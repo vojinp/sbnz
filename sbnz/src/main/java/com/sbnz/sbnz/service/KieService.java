@@ -10,6 +10,8 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -34,6 +36,8 @@ public class KieService {
     @Autowired
     IngredientService ingredientService;
 
+    @Autowired
+    private SimpMessagingTemplate template;
 
     public void fillKieSession(KieSession kieSession) {
         List<Disease> diseases = diseaseService.findAll();
@@ -51,7 +55,7 @@ public class KieService {
 
     public void startMonitoringSimulation() {
         KieSession kieSession = kieContainer.newKieSession("monitoring-session");
-//        kieSession.setGlobal("reasonerService", this);
+        kieSession.setGlobal("kieService", this);
         MonPatient patient = new MonPatient();
         kieSession.insert(patient);
 
@@ -83,6 +87,12 @@ public class KieService {
 
         }
         kieSession.fireUntilHalt();
+    }
+
+    @MessageMapping("/send/message")
+    public void sendMessage(String message) {
+        System.out.println("MESSAGE: " + message);
+        this.template.convertAndSend("/chat", message);
     }
 
 }

@@ -18,6 +18,7 @@ import {DiseaseManagerComponent} from './disease/pages/disease-manager/disease-m
 import {SymptomManagerComponent} from './symptom/pages/symptom-manager/symptom-manager.component';
 import {MedicationManagerComponent} from './medication/pages/medication-manager/medication-manager.component';
 import {IngredientManagerComponent} from './ingredient/pages/ingredient-manager/ingredient-manager.component';
+import {MonitoringPageComponent} from './pages/monitoring-page/monitoring-page.component';
 
 const routes = [
   {path: '', component: NavBarComponent, outlet: 'navbar'},
@@ -37,6 +38,7 @@ const routes = [
       {path: 'addiction-patients', component: AddictionReportComponent},
       {path: 'immune-patients', component: ImmuneReportComponent}
     ]},
+  {path: 'monitoring', component: MonitoringPageComponent},
   {path: 'admin', component: AdminPageComponent, children: [
       {path: '', redirectTo: 'users-manager', pathMatch: 'full'},
       {path: 'users-manager', component: UserManagerComponent},

@@ -2,8 +2,9 @@
   <a class="navbar-brand" href="#">SBNZ</a>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a *ngIf="authenticationService.getRole() === 'A'" class="nav-item nav-link" href="/#/reasoner">Reasoner <span class="sr-only">(current)</span></a>
+      <a *ngIf="authenticationService.getRole() === 'DOCTOR'" class="nav-item nav-link" href="/#/reasoner">Reasoner <span class="sr-only">(current)</span></a>
       <a *ngIf="authenticationService.getRole() === 'DOCTOR'" class="nav-item nav-link" href="/#/report">Reports</a>
+      <a *ngIf="authenticationService.getRole() === 'DOCTOR'" class="nav-item nav-link" href="/#/monitoring">Monitoring</a>
     </div>
   </div>
   <a *ngIf="loggedIn()" (click)="logOut()" class="nav-link my-2 my-sm-0" href="#">Log out</a>

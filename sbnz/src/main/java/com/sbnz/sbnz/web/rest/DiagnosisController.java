@@ -2,6 +2,7 @@ package com.sbnz.sbnz.web.rest;
 
 import com.sbnz.sbnz.domain.Diagnosis;
 import com.sbnz.sbnz.service.DiagnosisService;
+import com.sbnz.sbnz.service.KieService;
 import com.sbnz.sbnz.service.dto.DiagnosisCreateDTO;
 import org.kie.api.runtime.KieContainer;
 import org.slf4j.Logger;
@@ -28,6 +29,9 @@ public class DiagnosisController {
 
     @Autowired
     private DiagnosisService diagnosisService;
+
+    @Autowired
+    private KieService kieService;
 
     @PostMapping()
     public ResponseEntity<Diagnosis> createDiagnosis(@RequestHeader("Authorization") String token,
@@ -69,5 +73,10 @@ public class DiagnosisController {
         log.debug("REST request to delete Diagnosis : {}", id);
         diagnosisService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/simulation")
+    public void simulation() {
+        kieService.startMonitoringSimulation();
     }
 }

@@ -6,7 +6,11 @@ import com.sbnz.sbnz.domain.monitoring.MonHeartbeat;
 import com.sbnz.sbnz.domain.monitoring.MonTachycardia;
 import com.sbnz.sbnz.domain.monitoring.MonUrgentDialysis;
 import com.sbnz.sbnz.domain.monitoring.MonUrination;
+import com.sbnz.sbnz.service.KieService;
 
+
+
+global KieService kieService;
 
 rule "Problem sa kiseonikom"
     @doc("Nivo kiseonika u krvi pacijenta je manja od 70 mmHg i u poslednjih 15 minuta nisu zabeleženi događaji rasta nivoa kiseonika")
@@ -48,6 +52,7 @@ rule "Ubrzan srcani ritam"
         )
     then
         insert(new MonTachycardia($p.id));
+        kieService.sendMessage("Ubrzan srcani ritam");
 end
 
 

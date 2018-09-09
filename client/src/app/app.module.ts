@@ -21,6 +21,7 @@ import {ReportsModule} from './report/reports.module';
 import {UsersModule} from './user/users.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {IngredientsModule} from './ingredient/ingredients.module';
+import { MonitoringPageComponent } from './pages/monitoring-page/monitoring-page.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import {IngredientsModule} from './ingredient/ingredients.module';
     LogInPageComponent,
     ReasonerPageComponent,
     AdminPageComponent,
-    ReportPageComponent
+    ReportPageComponent,
+    MonitoringPageComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +44,7 @@ import {IngredientsModule} from './ingredient/ingredients.module';
     ReportsModule,
     UsersModule,
     NgbModule,
-    IngredientsModule
+    IngredientsModule,
   ],
   providers: [
     LogInService
