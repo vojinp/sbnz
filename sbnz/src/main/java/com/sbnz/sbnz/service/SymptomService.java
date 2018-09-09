@@ -63,4 +63,17 @@ public class SymptomService {
 
         return symptoms;
     }
+
+    public void removeFromSession(Long id) {
+        for (String token: kieService.kieSessions.keySet()) {
+            KieSession kieSession =  kieService.kieSessions.get(token);
+            Symptom s;
+
+            QueryResults results = kieSession.getQueryResults("Get Symptom", id);
+            for (QueryResultsRow r: results) {
+                s = (Symptom)r.get("$s");
+                kieSession.delete(kieSession.getFactHandle(s));
+            }
+        }
+    }
 }

@@ -7,20 +7,27 @@ import {JwtHelper} from 'angular2-jwt';
 })
 export class AuthenticationService {
   private jwtHelper: JwtHelper = new JwtHelper();
-  statusChanged: Subject<string[]>;
+
   private authenticated;
 
   constructor() {
     this.authenticated = this.getToken() != null ? true : false;
-    this.statusChanged = new Subject<string[]>();
   }
 
   getUsername() {
     return this.jwtHelper.decodeToken(this.getToken()).sub;
   }
 
-  getId() {
-    return this.jwtHelper.decodeToken(this.getToken()).id;
+  getRole() {
+    return localStorage.getItem('Role');
+  }
+
+  saveRole(role) {
+    localStorage.setItem('Role', role);
+  }
+
+  getDecoded() {
+    return this.jwtHelper.decodeToken(this.getToken());
   }
 
   isExpired() {
@@ -33,7 +40,6 @@ export class AuthenticationService {
   saveToken(token) {
     localStorage.setItem('Authorization', token);
     this.authenticated = true;
-    this.statusChanged.next(this.getType());
   }
 
   getToken() {
@@ -42,15 +48,8 @@ export class AuthenticationService {
 
   removeToken() {
     localStorage.removeItem('Authorization');
-    this.statusChanged.next([]);
+    localStorage.removeItem('Role');
     this.authenticated = false;
-  }
-
-  getType() {
-    if (this.getToken()) {
-      return this.jwtHelper.decodeToken(this.getToken()).authorities;
-    }
-    return null;
   }
 
   isAuthenticated() {

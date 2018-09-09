@@ -1,0 +1,11 @@
+Patient
+<app-patient-picker (patientEvent)="setPatient($event)"></app-patient-picker>
+Temperature: <input type="text" id="tempInput" [(ngModel)]="temp">
+<app-symptom-table *ngIf="symptoms" [symptoms]="symptoms" (checkChange)="check($event)"></app-symptom-table>
+<button type="button" class="btn btn-primary" (click)="startReasoner()">Start reasoner</button>
+<p *ngIf="diseases">Disease with the biggest posibility: <br>
+  <span *ngFor="let d of diseases; index as i;">
+    GROUP {{i+1}}:
+    {{d.disease.name}}, {{d.probability}}%
+  </span>
+</p>

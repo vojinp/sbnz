@@ -2,6 +2,7 @@ package com.sbnz.sbnz.web.rest;
 
 import com.sbnz.sbnz.domain.Ingredient;
 import com.sbnz.sbnz.service.IngredientService;
+import com.sbnz.sbnz.service.KieService;
 import org.kie.api.runtime.KieContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,9 @@ public class IngredientController {
     @Autowired
     private IngredientService ingredientService;
 
+    @Autowired
+    private KieService kieService;
+
     @PostMapping()
     public ResponseEntity<Ingredient> createIngredient(@RequestBody Ingredient ingredient) throws URISyntaxException {
         log.debug("REST request to save Ingredient : {}", ingredient);
@@ -35,6 +39,11 @@ public class IngredientController {
             return ResponseEntity.badRequest().build();
         }
         Ingredient result = ingredientService.save(ingredient);
+
+        for (String token: kieService.kieSessions.keySet()) {
+            kieService.kieSessions.get(token).insert(result);
+        }
+
         return ResponseEntity.created(new URI("/api/ingredient/" + result.getId())).body(result);
     }
 
@@ -65,6 +74,7 @@ public class IngredientController {
     public ResponseEntity<Void> deleteIngredient(@PathVariable Long id) {
         log.debug("REST request to delete Ingredient : {}", id);
         ingredientService.delete(id);
+        ingredientService.removeFromSession(id);
         return ResponseEntity.ok().build();
     }
 }

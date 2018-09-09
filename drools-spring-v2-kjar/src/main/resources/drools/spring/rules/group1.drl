@@ -48,7 +48,7 @@ salience( Utility.getPercentage($counter, 7) )
     			name.equals("Kijanje") ||
                 name.equals("Bol u grlu") ||
                 name.equals("Kasalj") ||
-                name.equals("Temperatura veca od 38") ||
+                (name.equals("Povisena temperatura") && value > 38) ||
                 name.equals("Curenje iz nosa") ||
                 name.equals("Glavobolja") ||
                 name.equals("Drhtavica")
@@ -64,6 +64,35 @@ salience( Utility.getPercentage($counter, 7) )
         diseaseService.setProbability($s, "Groznica", Utility.getPercentage($counter, 7));
 end
 
+rule "Upala krajnika"
+agenda-group "Diseases"
+activation-group "1"
+lock-on-active true
+salience( Utility.getPercentage($counter, 8) )
+    when
+    	$s : Symptoms ($symps: symptoms)
+    	$counter: Integer ( intValue >= 4 ) from accumulate (
+    		Symptom(
+    			name.equals("Bol koji se siri do usiju") ||
+                name.equals("Bol u grlu") ||
+                name.equals("Glavobolja") ||
+                (name.equals("Povisena temperatura") && value >= 40 && value <= 41) ||
+                name.equals("Gubitak apetita") ||
+                name.equals("Umor") ||
+                name.equals("Drhtavica") ||
+                name.equals("Zuti sekret iz nosa")
+
+    		) from $symps,
+    		init ( int i = 0; ),
+    		action ( i++; ),
+    		reverse ( i--; ),
+    		result ( i )
+    	)
+    then
+        System.out.println( "Activated rule: upala krajnika");
+        diseaseService.setProbability($s, "Groznica", Utility.getPercentage($counter, 8));
+end
+
 rule "Sinusna infekcija"
 agenda-group "Diseases"
 activation-group "1"
@@ -77,7 +106,7 @@ salience( Utility.getPercentage($counter, 7) )
     			name.equals("Oticanje oko ociju") ||
                 name.equals("Glavobolja") ||
                 name.equals("Zuti sekret iz nosa") ||
-                name.equals("Temperatura veca od 38") ||
+                (name.equals("Povisena temperatura") && value > 38) ||
                 name.equals("Bol u grlu") ||
                 name.equals("Kasalj")
     		) from $symps,

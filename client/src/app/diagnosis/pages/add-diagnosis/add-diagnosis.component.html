@@ -1,0 +1,6 @@
+Patient
+<app-patient-picker (patientEvent)="setPatient($event)"></app-patient-picker>
+Disease
+<app-disease-select [diseases]="diseases" (diseaseEvent)="setDisease($event)"></app-disease-select>
+<app-medication-table [medications]="medications" (checkChange)="check($event)"></app-medication-table>
+<button type="button" class="btn btn-primary" (click)="addDiagnosis()">Add diagnosis</button>

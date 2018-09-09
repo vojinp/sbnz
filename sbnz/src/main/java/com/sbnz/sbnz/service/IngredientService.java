@@ -1,7 +1,11 @@
 package com.sbnz.sbnz.service;
 
 import com.sbnz.sbnz.domain.Ingredient;
+import com.sbnz.sbnz.domain.Symptom;
 import com.sbnz.sbnz.repository.IngredientRepository;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,9 @@ public class IngredientService {
 
     @Autowired
     private IngredientRepository ingredientRepository;
+
+    @Autowired
+    private KieService kieService;
 
     public Ingredient save(Ingredient ingredient) {
         log.debug("Request to save Ingredient : {}", ingredient);
@@ -40,6 +47,19 @@ public class IngredientService {
     public void delete(Long id) {
         log.debug("Request to delete Ingredient : {}", id);
         ingredientRepository.deleteById(id);
+    }
+
+    public void removeFromSession(Long id) {
+        for (String token: kieService.kieSessions.keySet()) {
+            KieSession kieSession =  kieService.kieSessions.get(token);
+            Symptom s;
+
+            QueryResults results = kieSession.getQueryResults("Get Ingredient", id);
+            for (QueryResultsRow r: results) {
+                s = (Symptom)r.get("$i");
+                kieSession.delete(kieSession.getFactHandle(s));
+            }
+        }
     }
 
 }

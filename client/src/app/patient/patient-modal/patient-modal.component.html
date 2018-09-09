@@ -1,0 +1,31 @@
+<div class="modal-header">
+  <h4 class="modal-title">Patient</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form>
+    <div class="form-group">
+      <label for="firstname">Firstname</label>
+      <input type="text" class="form-control" id="firstname" placeholder="firstname" [(ngModel)]="patient.firstname"
+             name="firstname">
+    </div>
+    <div class="form-group">
+      <label for="lastname">Lastname</label>
+      <input type="text" class="form-control" id="lastname" placeholder="lastname" [(ngModel)]="patient.lastname"
+             name="lastname">
+    </div>
+    <div class="form-group">
+      <label for="inRecovery">In recovery</label>
+      <select class="form-control" id="inRecovery" [(ngModel)]="patient.inRecovery" name="inRecovery">
+        <option [ngValue]="true">Yes</option>
+        <option [ngValue]="false">No</option>
+      </select>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark" (click)="activeModal.dismiss()">Close</button>
+  <button type="button" class="btn btn-outline-dark" (click)="activeModal.close(patient)">Save</button>
+</div>

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sbnz.sbnz.domain.Disease;
 import com.sbnz.sbnz.domain.Symptoms;
 import com.sbnz.sbnz.service.DiseaseService;
+import com.sbnz.sbnz.service.KieService;
 import com.sbnz.sbnz.service.dto.DiseaseCountDTO;
 import com.sbnz.sbnz.service.dto.DiseaseProbabilityDTO;
 import org.kie.api.runtime.KieContainer;
@@ -34,6 +35,9 @@ public class DiseaseController {
     @Autowired
     private DiseaseService diseaseService;
 
+    @Autowired
+    private KieService kieService;
+
     @PostMapping()
     public ResponseEntity<Disease> createDisease(@RequestBody Disease disease) throws URISyntaxException {
         log.debug("REST request to save Disease : {}", disease);
@@ -41,6 +45,11 @@ public class DiseaseController {
             return ResponseEntity.badRequest().build();
         }
         Disease result = diseaseService.save(disease);
+
+        for (String token: kieService.kieSessions.keySet()) {
+            kieService.kieSessions.get(token).insert(result);
+        }
+
         return ResponseEntity.created(new URI("/api/disease/" + result.getId())).body(result);
     }
 
@@ -71,6 +80,7 @@ public class DiseaseController {
     public ResponseEntity<Void> deleteDisease(@PathVariable Long id) {
         log.debug("REST request to delete Disease : {}", id);
         diseaseService.delete(id);
+        diseaseService.removeFromSession(id);
         return ResponseEntity.ok().build();
     }
 

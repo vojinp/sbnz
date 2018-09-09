@@ -1,0 +1,7 @@
+<app-disease-select [diseases]="diseases" (diseaseEvent)="setDisease($event)"></app-disease-select>
+<button type="button" class="btn btn-primary" (click)="findSymptoms()">Find symptoms</button>
+<p *ngIf="symptoms">Symptoms for disease: <br>
+  <span *ngFor="let d of symptoms; index as i;">
+    {{d.name}} <br>
+  </span>
+</p>

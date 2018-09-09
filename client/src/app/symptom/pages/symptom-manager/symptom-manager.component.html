@@ -1,0 +1,4 @@
+<button type="button" class="btn btn-primary" (click)="open({}, 'add')">Add new symptom</button>
+<app-symptom-table [symptoms]="symptoms" (changeEvent)="open($event, 'change')"
+                   (removeEvent)="removeSymptom($event)"></app-symptom-table>
+

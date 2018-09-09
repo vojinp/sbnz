@@ -1,8 +1,13 @@
 package com.sbnz.sbnz.domain;
 
+import com.sbnz.sbnz.domain.enumeration.Authority;
+import com.sbnz.sbnz.domain.enumeration.MedType;
+
 public class JWTUser {
 
     private String username;
+
+    private String role;
 
     public JWTUser() {}
 
@@ -16,6 +21,14 @@ public class JWTUser {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

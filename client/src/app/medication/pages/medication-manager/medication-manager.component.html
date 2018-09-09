@@ -1,0 +1,4 @@
+<button type="button" class="btn btn-primary" (click)="open({}, 'add')">Add new medication</button>
+<app-medication-table [medications]="medications" (changeEvent)="open($event, 'change')"
+                   (removeEvent)="removeMedication($event)"></app-medication-table>
+

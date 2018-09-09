@@ -1,6 +1,7 @@
 package com.sbnz.sbnz.web.rest;
 
 import com.sbnz.sbnz.domain.Symptom;
+import com.sbnz.sbnz.service.KieService;
 import com.sbnz.sbnz.service.SymptomService;
 import org.kie.api.runtime.KieContainer;
 import org.slf4j.Logger;
@@ -28,6 +29,8 @@ public class SymptomController {
     @Autowired
     private SymptomService symptomService;
 
+    @Autowired
+    private KieService kieService;
     @PostMapping()
     public ResponseEntity<Symptom> createSymptom(@RequestBody Symptom symptom) throws URISyntaxException {
         log.debug("REST request to save Symptom : {}", symptom);
@@ -35,6 +38,11 @@ public class SymptomController {
             return ResponseEntity.badRequest().build();
         }
         Symptom result = symptomService.save(symptom);
+
+        for (String token: kieService.kieSessions.keySet()) {
+            kieService.kieSessions.get(token).insert(result);
+        }
+
         return ResponseEntity.created(new URI("/api/symptom/" + result.getId())).body(result);
     }
 
@@ -65,6 +73,7 @@ public class SymptomController {
     public ResponseEntity<Void> deleteSymptom(@PathVariable Long id) {
         log.debug("REST request to delete Symptom : {}", id);
         symptomService.delete(id);
+        symptomService.removeFromSession(id);
         return ResponseEntity.ok().build();
     }
 

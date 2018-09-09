@@ -26,6 +26,9 @@ public class Symptom {
     @JsonIgnore
     private Set<Disease> diseases = new HashSet<>();
 
+    @Column(name = "value", nullable = true)
+    private Double value;
+
     public Symptom(@NotNull String name) {
         this.name = name;
         specific = false;
@@ -33,6 +36,14 @@ public class Symptom {
 
     public Symptom() {
         specific = false;
+    }
+
+    public Double getValue() {
+        return value;
+    }
+
+    public void setValue(Double value) {
+        this.value = value;
     }
 
     public boolean isSpecific() {

@@ -116,8 +116,7 @@ function boolean hadSurgery(Symptoms s) {
 function boolean highBodyTemperatureInLast14Days(Symptoms s) {
     for (Diagnosis diagnosis: s.getPatient().getDiagnoses()) {
         if (diagnosis.getDate().after(new DateTime(new Date()).minusDays(14).toDate())) {
-            if (diagnosis.getDisease().getSymptoms().equals(new Symptom("Temperatura veca od 38")) ||
-                diagnosis.getDisease().getSymptoms().equals(new Symptom("Temperatura od 40 do 41"))) {
+            if (diagnosis.getDisease().getSymptoms().equals(new Symptom("Povisena temperatura"))) {
                 return true;
             }
 

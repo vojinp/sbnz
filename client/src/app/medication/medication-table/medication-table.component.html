@@ -1,0 +1,22 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Name</th>
+    <th scope="col">Group</th>
+    <th scope="col">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let m of medications; index as i">
+    <td>{{i + 1}}</td>
+    <td>{{m.name}}</td>
+    <td>{{m.type}}</td>
+    <td>
+      <input *ngIf="authenticationService.getRole() === 'DOCTOR'" type="checkbox" (change)="checkChange.emit(m)">
+      <button *ngIf="authenticationService.getRole() === 'ADMIN'"  type="button" class="btn btn-primary" (click)="changeEvent.emit(m)">Change</button>
+      <button *ngIf="authenticationService.getRole() === 'ADMIN'"  type="button" class="btn btn-danger" (click)="removeEvent.emit(m)">Remove</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

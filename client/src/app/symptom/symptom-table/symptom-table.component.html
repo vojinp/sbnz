@@ -1,0 +1,20 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Name</th>
+    <th scope="col">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let symptom of symptoms; index as i">
+    <td>{{i + 1}}</td>
+    <td>{{symptom.name}}</td>
+    <td>
+      <input *ngIf="authenticationService.getRole() === 'DOCTOR'" type="checkbox" (change)="checkChange.emit(symptom)">
+      <button *ngIf="authenticationService.getRole() === 'ADMIN'"  type="button" class="btn btn-primary" (click)="changeEvent.emit(symptom)">Change</button>
+      <button *ngIf="authenticationService.getRole() === 'ADMIN'"  type="button" class="btn btn-danger" (click)="removeEvent.emit(symptom)">Remove</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

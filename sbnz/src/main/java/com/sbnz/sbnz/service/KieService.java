@@ -4,6 +4,8 @@ import com.sbnz.sbnz.domain.Disease;
 import com.sbnz.sbnz.domain.Ingredient;
 import com.sbnz.sbnz.domain.Medication;
 import com.sbnz.sbnz.domain.Symptom;
+import com.sbnz.sbnz.domain.monitoring.MonHeartbeat;
+import com.sbnz.sbnz.domain.monitoring.MonPatient;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -45,6 +47,42 @@ public class KieService {
 
         List<Ingredient> ingredients = ingredientService.findAll();
         ingredients.forEach(kieSession::insert);
+    }
+
+    public void startMonitoringSimulation() {
+        KieSession kieSession = kieContainer.newKieSession("monitoring-session");
+//        kieSession.setGlobal("reasonerService", this);
+        MonPatient patient = new MonPatient();
+        kieSession.insert(patient);
+
+        Thread t = new Thread(() -> {
+            while (true) {
+                for (int i = 0; i < 30; i++) {
+                    MonHeartbeat event = new MonHeartbeat(patient.getId());
+                    kieSession.insert(event);
+
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+
+        }
+        kieSession.fireUntilHalt();
     }
 
 }

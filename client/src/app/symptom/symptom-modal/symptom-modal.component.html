@@ -1,0 +1,26 @@
+<div class="modal-header">
+  <h4 class="modal-title">Symptom</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form>
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" class="form-control" id="name" placeholder="name" [(ngModel)]="symptom.name"
+             name="name">
+    </div>
+    <div class="form-group">
+      <label for="specific">Group</label>
+      <select class="form-control" id="specific" [(ngModel)]="symptom.specific" name="specific">
+        <option selected [ngValue]="true">YES</option>
+        <option [ngValue]="false">NO</option>
+      </select>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark" (click)="activeModal.dismiss()">Close</button>
+  <button type="button" class="btn btn-outline-dark" (click)="activeModal.close(symptom)">Save</button>
+</div>

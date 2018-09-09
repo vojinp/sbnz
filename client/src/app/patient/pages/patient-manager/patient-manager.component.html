@@ -1,0 +1,4 @@
+<button type="button" class="btn btn-primary" (click)="open({}, 'add')">Add new patient</button>
+<app-patient-table [patients]="patients" (changeEvent)="open($event, 'change')"
+                (removeEvent)="removePatient($event)"></app-patient-table>
+

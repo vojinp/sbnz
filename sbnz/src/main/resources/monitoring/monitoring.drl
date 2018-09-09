@@ -1,0 +1,73 @@
+import com.sbnz.sbnz.domain.monitoring.MonPatient;
+import com.sbnz.sbnz.domain.monitoring.MonOxygenMeasure;
+import com.sbnz.sbnz.domain.monitoring.MonOxygenProblem;
+import com.sbnz.sbnz.domain.monitoring.MonOxygenRaised;
+import com.sbnz.sbnz.domain.monitoring.MonHeartbeat;
+import com.sbnz.sbnz.domain.monitoring.MonTachycardia;
+import com.sbnz.sbnz.domain.monitoring.MonUrgentDialysis;
+import com.sbnz.sbnz.domain.monitoring.MonUrination;
+
+
+rule "Problem sa kiseonikom"
+    @doc("Nivo kiseonika u krvi pacijenta je manja od 70 mmHg i u poslednjih 15 minuta nisu zabeleženi događaji rasta nivoa kiseonika")
+agenda-group "Monitoring"
+    when
+        $p: MonPatient( )
+        $e1: MonOxygenMeasure ( level < 70, patientId == $p.id ) over window:length (1)
+        $count: Number( intValue == 0 ) from accumulate (
+            $raised: MonOxygenRaised( patientId == $p.id ) over window:time (15m), count($raised)
+        )
+    then
+        System.out.println("A");
+        insert(new MonOxygenProblem($p.id));
+end
+
+rule "Krvni pritisak nije rastao"
+    @doc("Krvni pritisak nije rastao")
+agenda-group "Monitoring"
+    when
+        $e1: MonOxygenMeasure ( )
+        $e2: MonOxygenMeasure( this after [3s, 7s] $e1, level > $e1.level, patientId == $e1.patientId )
+    then
+        insert(new MonOxygenRaised($e1.patientId));
+end
+
+
+declare window Heartbeats
+    @doc("Broji otkucaje srca u poslednjih 10s")
+    MonHeartbeat() over window:time ( 10s )
+end
+
+rule "Ubrzan srcani ritam"
+    @doc("U poslednjih 10 sekundi zabeleženo više od 25 otkucaja srca")
+    when
+        $p: MonPatient( )
+        $total: Number( intValue > 25 ) from accumulate (
+            MonHeartbeat( patientId == $p.id ) from window Heartbeats,
+            count(1)
+        )
+    then
+        insert(new MonTachycardia($p.id));
+end
+
+
+declare window Urinations
+    @doc("Izmereno u poslednjih 12h")
+    MonUrination() over window:time ( 12h )
+end
+
+rule "Hitno potrebna dijaliza"
+    @doc("Pacijent boluje od hronične bubrežne bolesti, U poslednjih 10 sekundi zabeleženo više od 10 otkucaja srca i Suma količine mokrenja u poslednjih 12 sati je manja od 100ml")
+    when
+        $p: MonPatient( diseases contains "Hronicna bubrezna bolest" )
+        $heartbeatsCount: Number( intValue > 10 ) from accumulate (
+            MonHeartbeat(patientId == $p.id) from window Heartbeats,
+            count( 1 )
+        )
+        $urineLevelSum: Number( intValue < 100 ) from accumulate (
+            $u: MonUrination( patientId == $p.id ) from window Urinations,
+            sum( $u.amount )
+        )
+    then
+        insert(new MonUrgentDialysis($p.id));
+end

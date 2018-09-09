@@ -1,0 +1,21 @@
+<table class="table" *ngIf="patients">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Name</th>
+    <th scope="col">Lastname</th>
+    <th scope="col" *ngIf="authenticationService.getRole() === 'ADMIN'">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let p of patients; index as i">
+    <td>{{i + 1}}</td>
+    <td>{{p.firstname}}</td>
+    <td>{{p.lastname}}</td>
+    <td *ngIf="authenticationService.getRole() === 'ADMIN'">
+      <button type="button" class="btn btn-primary" (click)="changeEvent.emit(p)">Change</button>
+      <button type="button" class="btn btn-danger" (click)="removeEvent.emit(p)">Remove</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

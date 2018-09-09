@@ -1,6 +1,7 @@
 package com.sbnz.sbnz.service;
 
 import com.sbnz.sbnz.domain.Disease;
+import com.sbnz.sbnz.domain.Symptom;
 import com.sbnz.sbnz.domain.Symptoms;
 import com.sbnz.sbnz.repository.DiseaseRepository;
 import com.sbnz.sbnz.service.dto.DiseaseCountDTO;
@@ -85,5 +86,18 @@ public class DiseaseService {
     public void setProbability(Symptoms symptoms, String diseaseName, int probability) {
         Disease disease = diseaseRepository.findByName(diseaseName);
         symptoms.getDiseases().add(new DiseaseProbabilityDTO(disease, probability));
+    }
+
+    public void removeFromSession(Long id) {
+        for (String token: kieService.kieSessions.keySet()) {
+            KieSession kieSession =  kieService.kieSessions.get(token);
+            Symptom s;
+
+            QueryResults results = kieSession.getQueryResults("Get Disease", id);
+            for (QueryResultsRow r: results) {
+                s = (Symptom)r.get("$d");
+                kieSession.delete(kieSession.getFactHandle(s));
+            }
+        }
     }
 }

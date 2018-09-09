@@ -1,7 +1,11 @@
 package com.sbnz.sbnz.service;
 
 import com.sbnz.sbnz.domain.Medication;
+import com.sbnz.sbnz.domain.Symptom;
 import com.sbnz.sbnz.repository.MedicationRepository;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,9 @@ public class MedicationService {
 
     @Autowired
     private MedicationRepository medicationRepository;
+
+    @Autowired
+    private KieService kieService;
 
     public Medication save(Medication medication) {
         log.debug("Request to save Medication : {}", medication);
@@ -40,6 +47,19 @@ public class MedicationService {
     public void delete(Long id) {
         log.debug("Request to delete Medication : {}", id);
         medicationRepository.deleteById(id);
+    }
+
+    public void removeFromSession(Long id) {
+        for (String token: kieService.kieSessions.keySet()) {
+            KieSession kieSession =  kieService.kieSessions.get(token);
+            Symptom s;
+
+            QueryResults results = kieSession.getQueryResults("Get Medication", id);
+            for (QueryResultsRow r: results) {
+                s = (Symptom)r.get("$m");
+                kieSession.delete(kieSession.getFactHandle(s));
+            }
+        }
     }
 
 }

@@ -9,3 +9,19 @@ import com.sbnz.sbnz.domain.Medication;
 query "Get all patients"
     $p: Patient()
 end
+
+query "Get Disease"(Long diseaseId)
+    $d: Disease(id == diseaseId)
+end
+
+query "Get Symptom"(Long symptomId)
+    $s: Symptom(id == symptomId)
+end
+
+query "Get Medication"(Long medicationId)
+    $m: Medication(id == medicationId)
+end
+
+query "Get Ingredient"(Long ingredientId)
+    $i: Ingredient(id == ingredientId)
+end

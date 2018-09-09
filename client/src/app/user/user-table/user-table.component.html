@@ -1,0 +1,22 @@
+<table class="table" *ngIf="users">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Authority</th>
+    <th scope="col">Username</th>
+    <th scope="col">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let u of users; index as i">
+    <td>{{i + 1}}</td>
+    <td>{{u.authority}}</td>
+    <td>{{u.username}}</td>
+    <td>
+      <button type="button" class="btn btn-primary" (click)="changeEvent.emit(u)">Change</button>
+      <button type="button" class="btn btn-danger" (click)="removeEvent.emit(u)">Remove</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+

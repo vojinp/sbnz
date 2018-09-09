@@ -1,0 +1,4 @@
+<button type="button" class="btn btn-primary" (click)="open({}, 'add')">Add new user</button>
+<app-user-table [users]="users" (changeEvent)="open($event, 'change')"
+(removeEvent)="removeUser($event)"></app-user-table>
+

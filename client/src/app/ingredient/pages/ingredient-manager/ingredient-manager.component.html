@@ -1,0 +1,4 @@
+<button type="button" class="btn btn-primary" (click)="open({}, 'add')">Add new ingredient</button>
+<app-ingredient-table [ingredients]="ingredients" (changeEvent)="open($event, 'change')"
+                      (removeEvent)="removeIngredient($event)"></app-ingredient-table>
+

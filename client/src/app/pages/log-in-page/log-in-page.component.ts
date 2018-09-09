@@ -31,6 +31,8 @@ export class LogInPageComponent implements OnInit {
 
       (res) => {
         this.authenticationService.saveToken(res.headers.get('Authorization'));
+        this.authenticationService.saveRole(res.body);
+        this.navigate();
       },
       (error) => {
         if (error.status === 401) {
@@ -38,6 +40,14 @@ export class LogInPageComponent implements OnInit {
         }
       }
     );
+  }
+
+  navigate() {
+    if (this.authenticationService.getRole() === 'DOCTOR')
+      this.router.navigate(['/reasoner']);
+    else
+      this.router.navigate(['/admin']);
+
   }
 
 }

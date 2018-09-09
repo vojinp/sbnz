@@ -2,6 +2,7 @@ package com.sbnz.sbnz.web.rest;
 
 import com.sbnz.sbnz.domain.JWTUser;
 import com.sbnz.sbnz.domain.User;
+import com.sbnz.sbnz.domain.enumeration.Authority;
 import com.sbnz.sbnz.service.JWTService;
 import com.sbnz.sbnz.service.KieService;
 import com.sbnz.sbnz.service.UserService;
@@ -43,6 +44,7 @@ public class AccountController {
         KieSession session = kieService.kieContainer.newKieSession();
         kieService.kieSessions.put(token, session);
         kieService.fillKieSession(session);
-        return new ResponseEntity<>( headers, HttpStatus.OK);
+        //kieService.startMonitoringSimulation();
+        return ResponseEntity.ok().headers(headers).body(user.getAuthority());
     }
 }

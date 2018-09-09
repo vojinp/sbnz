@@ -1,6 +1,7 @@
 package com.sbnz.sbnz.web.rest;
 
 import com.sbnz.sbnz.domain.Medication;
+import com.sbnz.sbnz.service.KieService;
 import com.sbnz.sbnz.service.MedicationService;
 import org.kie.api.runtime.KieContainer;
 import org.slf4j.Logger;
@@ -28,6 +29,9 @@ public class MedicationController {
     @Autowired
     private MedicationService medicationService;
 
+    @Autowired
+    private KieService kieService;
+
     @PostMapping()
     public ResponseEntity<Medication> createMedication(@RequestBody Medication medication) throws URISyntaxException {
         log.debug("REST request to save Medication : {}", medication);
@@ -35,6 +39,11 @@ public class MedicationController {
             return ResponseEntity.badRequest().build();
         }
         Medication result = medicationService.save(medication);
+
+        for (String token: kieService.kieSessions.keySet()) {
+            kieService.kieSessions.get(token).insert(result);
+        }
+
         return ResponseEntity.created(new URI("/api/medication/" + result.getId())).body(result);
     }
 
@@ -65,6 +74,7 @@ public class MedicationController {
     public ResponseEntity<Void> deleteMedication(@PathVariable Long id) {
         log.debug("REST request to delete Medication : {}", id);
         medicationService.delete(id);
+        medicationService.removeFromSession(id);
         return ResponseEntity.ok().build();
     }
 }

@@ -2,6 +2,7 @@ package com.sbnz.sbnz.web.rest;
 
 import com.sbnz.sbnz.domain.Diagnosis;
 import com.sbnz.sbnz.service.DiagnosisService;
+import com.sbnz.sbnz.service.dto.DiagnosisCreateDTO;
 import org.kie.api.runtime.KieContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +30,14 @@ public class DiagnosisController {
     private DiagnosisService diagnosisService;
 
     @PostMapping()
-    public ResponseEntity<Diagnosis> createDiagnosis(@RequestBody Diagnosis diagnosis) throws URISyntaxException {
+    public ResponseEntity<Diagnosis> createDiagnosis(@RequestHeader("Authorization") String token,
+                                                     @RequestBody DiagnosisCreateDTO diagnosis) throws URISyntaxException {
         log.debug("REST request to save Diagnosis : {}", diagnosis);
-        if (diagnosis.getId() != null) {
+        Diagnosis result = diagnosisService.save(diagnosis);
+        if (diagnosisService.validatePrescription(result, token).size() > 0) {
+            diagnosisService.delete(result.getId());
             return ResponseEntity.badRequest().build();
         }
-        Diagnosis result = diagnosisService.save(diagnosis);
         return ResponseEntity.created(new URI("/api/diagnosis/" + result.getId())).body(result);
     }
 
@@ -44,7 +47,7 @@ public class DiagnosisController {
         if (diagnosis.getId() == null) {
             return ResponseEntity.badRequest().build();
         }
-        Diagnosis result = diagnosisService.save(diagnosis);
+        Diagnosis result = diagnosisService.update(diagnosis);
         return ResponseEntity.ok().body(result);
     }
 

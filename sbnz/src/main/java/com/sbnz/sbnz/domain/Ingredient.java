@@ -18,11 +18,11 @@ public class Ingredient {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "ingredients")
     @JsonIgnore
     private Set<Patient> patients = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "ingredients")
     @JsonIgnore
     private Set<Medication> medications = new HashSet<>();
 
@@ -56,5 +56,10 @@ public class Ingredient {
 
     public void setMedications(Set<Medication> medications) {
         this.medications = medications;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return id.equals(((Ingredient) obj).getId());
     }
 }
