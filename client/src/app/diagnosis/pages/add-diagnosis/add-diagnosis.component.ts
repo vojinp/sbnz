@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {DiagnosisService} from '../../shared/diagnosis.service';
 import {AuthenticationService} from '../../../shared/authentication.service';
+import { ToastrManager } from 'ng6-toastr-notifications';
+
 
 @Component({
   selector: 'app-add-diagnosis',
@@ -15,7 +17,8 @@ export class AddDiagnosisComponent implements OnInit {
   checkedMedication = [];
   constructor(
     private diagnosisService: DiagnosisService,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private toastr: ToastrManager
   ) { }
 
   ngOnInit() {
@@ -36,7 +39,8 @@ export class AddDiagnosisComponent implements OnInit {
         console.log(res);
     },
     error => {
-      console.log(error);
+      if (error.status === 400)
+        this.toastr.errorToastr('Patient is allergic to some of the ingredients!', 'Oops!');
     });
   }
 

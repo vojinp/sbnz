@@ -5,7 +5,7 @@ Temperature: <input type="text" id="tempInput" [(ngModel)]="temp">
 <button type="button" class="btn btn-primary" (click)="startReasoner()">Start reasoner</button>
 <p *ngIf="diseases">Disease with the biggest posibility: <br>
   <span *ngFor="let d of diseases; index as i;">
-    GROUP {{i+1}}:
+    {{ d.disease.group }}
     {{d.disease.name}}, {{d.probability}}%
   </span>
 </p>

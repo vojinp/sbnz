@@ -1,6 +1,8 @@
 package com.sbnz.sbnz.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -36,6 +38,7 @@ public class Diagnosis {
             name = "diagnosis_medication",
             joinColumns = {@JoinColumn(name = "diagnosis_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "medication_id", referencedColumnName = "id")})
+    @LazyCollection(LazyCollectionOption.FALSE)
     private Set<Medication> medications = new HashSet<>();
 
     public Long getId() {

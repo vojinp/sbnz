@@ -87,8 +87,8 @@ public class DiagnosisService {
         for (QueryResultsRow r : results) {
             ingredients = (ArrayList<Ingredient>) r.get("$criticalIngredients");
         }
-        System.out.println( diagnosis.getMedications().iterator().next().getIngredients().iterator().next());
-        System.out.println(diagnosis.getPatient().getIngredients().iterator().next());
+//        System.out.println( diagnosis.getMedications().iterator().next().getIngredients().iterator().next());
+//        System.out.println(diagnosis.getPatient().getIngredients().iterator().next());
         System.out.println(ingredients);
         kieSession.delete(kieSession.getFactHandle(diagnosis));
         return ingredients;

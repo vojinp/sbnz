@@ -22,6 +22,8 @@ import {UsersModule} from './user/users.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {IngredientsModule} from './ingredient/ingredients.module';
 import { MonitoringPageComponent } from './pages/monitoring-page/monitoring-page.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ng6-toastr-notifications';
 
 
 @NgModule({
@@ -45,6 +47,8 @@ import { MonitoringPageComponent } from './pages/monitoring-page/monitoring-page
     UsersModule,
     NgbModule,
     IngredientsModule,
+    ToastrModule.forRoot(),
+    BrowserAnimationsModule
   ],
   providers: [
     LogInService
