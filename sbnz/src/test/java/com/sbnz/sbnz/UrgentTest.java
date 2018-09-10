@@ -25,15 +25,15 @@ public class UrgentTest {
     private KieSession kieSession;
 
     @Before
-    public void testCEPConfigThroughKModuleXML() throws ParseException {
+    public void createSession() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
         kieSession = kContainer.newKieSession("monitoring-pseudo-session");
     }
 
     @Test
-    public void urgentDialysisNeeded() throws ParseException {
-        SessionPseudoClock clock = kieSession.getSessionClock();
+    public void urgentTest() {
+        SessionPseudoClock pseudoClock = kieSession.getSessionClock();
 
         MonPatient patient = new MonPatient();
         patient.getDiseases().add("Prehlada");
@@ -49,7 +49,7 @@ public class UrgentTest {
         for (int i = 0; i < 20; i++) {
             urinationEvent = new MonUrination(patient.getId(), 3);
             kieSession.insert(urinationEvent);
-            clock.advanceTime(1, TimeUnit.HOURS);
+            pseudoClock.advanceTime(1, TimeUnit.HOURS);
         }
 
         MonHeartbeat beat;
@@ -59,7 +59,7 @@ public class UrgentTest {
 
             beat = new MonHeartbeat(patient.getId());
             kieSession.insert(beat);
-            clock.advanceTime(1, TimeUnit.SECONDS);
+            pseudoClock.advanceTime(1, TimeUnit.SECONDS);
         }
 
         kieSession.fireAllRules();

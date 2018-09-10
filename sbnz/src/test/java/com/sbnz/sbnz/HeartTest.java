@@ -24,15 +24,15 @@ public class HeartTest {
     private KieSession kieSession;
 
     @Before
-    public void testCEPConfigThroughKModuleXML() throws ParseException {
+    public void createSession() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
         kieSession = kContainer.newKieSession("monitoring-pseudo-session");
     }
 
     @Test
-    public void normalHeartBeatTest() throws ParseException {
-        SessionPseudoClock clock = kieSession.getSessionClock();
+    public void normalHeartBeatTest() {
+        SessionPseudoClock pseudoClock = kieSession.getSessionClock();
         MonPatient patient = new MonPatient();
 
         for (int index = 0; index < 10; index++) {
@@ -41,7 +41,7 @@ public class HeartTest {
 
             beat = new MonHeartbeat(patient.getId());
             kieSession.insert(beat);
-            clock.advanceTime(1, TimeUnit.SECONDS);
+            pseudoClock.advanceTime(1, TimeUnit.SECONDS);
             int ruleCount = kieSession.fireAllRules();
 
             assertThat(ruleCount, equalTo(0));
@@ -52,8 +52,8 @@ public class HeartTest {
     }
 
     @Test
-    public void rapidHeartBeatTest() throws ParseException {
-        SessionPseudoClock clock = kieSession.getSessionClock();
+    public void rapidHeartBeatTest() {
+        SessionPseudoClock pseudoClock = kieSession.getSessionClock();
         MonPatient patient = new MonPatient();
         MonHeartbeat beat;
 
@@ -69,7 +69,7 @@ public class HeartTest {
             beat = new MonHeartbeat(patient.getId());
             kieSession.insert(beat);
 
-            clock.advanceTime(1, TimeUnit.SECONDS);
+            pseudoClock.advanceTime(1, TimeUnit.SECONDS);
         }
 
         Collection<?> heartbeatEvents = kieSession.getObjects(new ClassObjectFilter(MonHeartbeat.class));

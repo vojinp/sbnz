@@ -64,27 +64,24 @@ public class KieService {
                 for (int i = 0; i < 30; i++) {
                     MonHeartbeat event = new MonHeartbeat(patient.getId());
                     kieSession.insert(event);
-
                     try {
-                        Thread.sleep(300);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
-
                     }
                 }
 
                 try {
                     Thread.sleep(60000);
                 } catch (InterruptedException e) {
-
                 }
+
             }
         });
         t.setDaemon(true);
         t.start();
         try {
-            Thread.sleep(300);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
-
         }
         kieSession.fireUntilHalt();
     }
